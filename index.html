@@ -44,10 +44,10 @@
 </head>
 <body>
 
- <video id="videoPlayer" autoplay loop playsinline>
-  <source src="01-hallo.mp4" type="video/mp4">
-</video>
-
+  <video id="videoPlayer" autoplay loop playsinline>
+    <source src="01-hallo.mp4" type="video/mp4">
+    Dein Browser unterstützt kein HTML5-Video.
+  </video>
 
   <div class="button-container" id="buttons"></div>
 
@@ -58,22 +58,19 @@
     const videos = {
       "start": {
         src: "01-hallo.mp4",
-        loop: true,
         buttons: [
           { text: "Hallo...", next: "02" }
         ]
       },
       "02": {
         src: "02-wieschoen.mp4",
-        loop: false,
         buttons: [
-          { text: "Wie kann ich dir helfen?", next: "03" },
-          { text: "Tschüss, Computer", next: "04" }
+          { text: "Wie kann ich dir helfen?", next: "04" },
+          { text: "Tschüss, Computer", next: "03" }
         ]
       },
       "03": {
         src: "03-kaputt.mp4",
-        loop: false,
         buttons: [
           { text: "Platzhalter 1", next: "start" },
           { text: "Platzhalter 2", next: "start" }
@@ -81,7 +78,6 @@
       },
       "04": {
         src: "04-bittegehnicht.mp4",
-        loop: false,
         buttons: [
           { text: "Ok, ich bleibe..", next: "02" },
           { text: "Nein, tschüss", next: "start" }
@@ -91,41 +87,25 @@
 
     let current = "start";
 
-   function loadVideo(key) {
-  const video = videos[key];
-  current = key;
+    function loadVideo(key) {
+      const video = videos[key];
+      current = key;
 
-  // Stop previous video
-  videoPlayer.pause();
-  videoPlayer.removeAttribute('src');
-  videoPlayer.load();
+      // Nur wenn wir NICHT im Startvideo sind: Quelle wechseln
+      if (key !== "start") {
+        videoPlayer.pause();
+        videoPlayer.removeAttribute('src');
+        videoPlayer.removeAttribute('loop'); // Loop sicher deaktivieren
+        videoPlayer.load();
 
-  // Neue Quelle setzen
-  videoPlayer.src = video.src;
-
-  // Nur wenn NICHT mehr in Start-Loop → loop entfernen
-  if (key === "start") {
-    videoPlayer.setAttribute('loop', '');
-  } else {
-    videoPlayer.removeAttribute('loop');
-  }
-
-  videoPlayer.muted = false;
-  videoPlayer.volume = 1.0;
-
-  const playPromise = videoPlayer.play();
-  if (playPromise !== undefined) {
-    playPromise.catch(() => {
-      document.body.addEventListener('click', () => {
+        videoPlayer.src = video.src;
+        videoPlayer.muted = false;
+        videoPlayer.volume = 1.0;
         videoPlayer.play();
-      }, { once: true });
-    });
-  }
+      }
 
-  renderButtons(video.buttons);
-}
-
-
+      renderButtons(video.buttons);
+    }
 
     function renderButtons(buttons) {
       buttonsDiv.innerHTML = '';
@@ -137,14 +117,16 @@
       });
     }
 
-    // Start initial state
+    // Initiale Buttons anzeigen
     renderButtons(videos["start"].buttons);
 
-    // Sicherstellen, dass Ton auch beim Start aktiviert werden kann
-    const initialPlay = videoPlayer.play();
-    if (initialPlay !== undefined) {
-      initialPlay.catch(() => {
+    // Ton aktivieren nach Interaktion
+    const playPromise = videoPlayer.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
         document.body.addEventListener('click', () => {
+          videoPlayer.muted = false;
+          videoPlayer.volume = 1.0;
           videoPlayer.play();
         }, { once: true });
       });
