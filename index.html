@@ -44,10 +44,10 @@
 </head>
 <body>
 
-  <video id="videoPlayer" autoplay playsinline>
-    <source src="01-hallo.mp4" type="video/mp4">
-    Dein Browser unterstützt kein HTML5-Video.
-  </video>
+ <video id="videoPlayer" autoplay loop playsinline>
+  <source src="01-hallo.mp4" type="video/mp4">
+</video>
+
 
   <div class="button-container" id="buttons"></div>
 
@@ -91,7 +91,7 @@
 
     let current = "start";
 
-    function loadVideo(key) {
+   function loadVideo(key) {
   const video = videos[key];
   current = key;
 
@@ -100,11 +100,11 @@
   videoPlayer.removeAttribute('src');
   videoPlayer.load();
 
-  // Set new video
+  // Neue Quelle setzen
   videoPlayer.src = video.src;
 
-  // Loop nur, wenn explizit erlaubt
-  if (video.loop) {
+  // Nur wenn NICHT mehr in Start-Loop → loop entfernen
+  if (key === "start") {
     videoPlayer.setAttribute('loop', '');
   } else {
     videoPlayer.removeAttribute('loop');
@@ -124,6 +124,7 @@
 
   renderButtons(video.buttons);
 }
+
 
 
     function renderButtons(buttons) {
