@@ -120,17 +120,20 @@
     // Initiale Buttons anzeigen
     renderButtons(videos["start"].buttons);
 
-    // Ton aktivieren nach Interaktion
-    const playPromise = videoPlayer.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        document.body.addEventListener('click', () => {
-          videoPlayer.muted = false;
-          videoPlayer.volume = 1.0;
-          videoPlayer.play();
-        }, { once: true });
-      });
-    }
+  // Ton aktivieren, sobald Maus sich bewegt oder geklickt wird
+const tryPlay = () => {
+  videoPlayer.muted = false;
+  videoPlayer.volume = 1.0;
+  videoPlayer.play();
+};
+
+const playPromise = videoPlayer.play();
+if (playPromise !== undefined) {
+  playPromise.catch(() => {
+    document.addEventListener('mousemove', tryPlay, { once: true });
+    document.addEventListener('click', tryPlay, { once: true });
+  });
+}
   </script>
 
 </body>
