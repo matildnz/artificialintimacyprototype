@@ -92,36 +92,39 @@
     let current = "start";
 
     function loadVideo(key) {
-      const video = videos[key];
-      current = key;
+  const video = videos[key];
+  current = key;
 
-      // Stop previous video cleanly
-      videoPlayer.pause();
-      videoPlayer.removeAttribute('src');
-      videoPlayer.load();
+  // Stop previous video
+  videoPlayer.pause();
+  videoPlayer.removeAttribute('src');
+  videoPlayer.load();
 
-      // Set new video
-      videoPlayer.src = video.src;
-      videoPlayer.loop = video.loop;
-      videoPlayer.muted = false;
-      videoPlayer.volume = 1.0;
+  // Set new video
+  videoPlayer.src = video.src;
 
-      const playPromise = videoPlayer.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            console.log("▶️ Video gestartet:", video.src);
-          })
-          .catch(error => {
-            console.warn("⚠️ Autoplay blockiert, warte auf Klick");
-            document.body.addEventListener('click', () => {
-              videoPlayer.play();
-            }, { once: true });
-          });
-      }
+  // Loop nur, wenn explizit erlaubt
+  if (video.loop) {
+    videoPlayer.setAttribute('loop', '');
+  } else {
+    videoPlayer.removeAttribute('loop');
+  }
 
-      renderButtons(video.buttons);
-    }
+  videoPlayer.muted = false;
+  videoPlayer.volume = 1.0;
+
+  const playPromise = videoPlayer.play();
+  if (playPromise !== undefined) {
+    playPromise.catch(() => {
+      document.body.addEventListener('click', () => {
+        videoPlayer.play();
+      }, { once: true });
+    });
+  }
+
+  renderButtons(video.buttons);
+}
+
 
     function renderButtons(buttons) {
       buttonsDiv.innerHTML = '';
